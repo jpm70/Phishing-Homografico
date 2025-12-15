@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Phishing Homográfico</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column; /* CLAVE 1: Apila los elementos verticalmente (body, container, footer) */
+            justify-content: flex-start; /* CLAVE 2: Inicia el contenido desde la parte superior */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+            flex-grow: 1; /* CLAVE 3: Hace que el contenedor principal ocupe todo el espacio restante, empujando el footer hacia abajo */
+        }
+        footer {
+            width: 100%;
+            max-width: 700px; /* Para alinear el texto del copyright con el contenedor principal */
+            text-align: center;
+            padding-top: 10px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+   
+        
+        h1, h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .email-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .email-header, .email-body {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .email-header strong {
+            display: inline-block;
+            width: 60px;
+            color: #555;
+        }
+        .phishing-url {
+            color: #c00;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            width: 45%;
+        }
+        .button.start-button {
+            width: auto;
+            min-width: 150px;
+            margin: 0 auto;
+            display: block;
+        }
+        .correct {
+            background-color: #28a745;
+            color: white;
+        }
+        .correct:hover {
+            background-color: #218838;
+        }
+        .phishing {
+            background-color: #dc3545;
+            color: white;
+        }
+        .phishing:hover {
+            background-color: #c82333;
+        }
+        .feedback {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .feedback.correct-answer {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.wrong-answer {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #result-summary {
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .intro-screen p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .character-example {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace; /* Para que los caracteres se vean más parecidos en ancho */
+            font-size: 1.1em;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .char-group {
+            border: 1px solid #ced4da;
+            padding: 10px;
+            border-radius: 5px;
+            flex: 1;
+            max-width: 48%;
+            text-align: left;
+        }
+        .char-group span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .char-group .latin {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .char-group .cyrillic {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .char-group .label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: normal;
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="main-title">Test de Phishing Homográfico</h1>
+    
+    <div id="intro-screen">
+        <h2>¿Qué es el Phishing Homográfico?</h2>
+        <p>El phishing homográfico es un tipo de ataque cibernético donde los atacantes utilizan nombres de dominio que son visualmente similares a los dominios legítimos. Esto se logra sustituyendo caracteres latinos por caracteres de otros alfabetos (como el cirílico) que se ven idénticos o casi idénticos.</p>
+        <p>El objetivo es engañar al usuario para que crea que está visitando un sitio web real, cuando en realidad está en una página falsa diseñada para robar sus credenciales o información personal.</p>
+
+        <h3>Ejemplo de Caracteres</h3>
+        <p>Observa cómo algunos caracteres latinos y cirílicos pueden ser indistinguibles a simple vista:</p>
+        <div class="character-example">
+            <div class="char-group">
+                <span><span class="latin">google.com</span> <span class="label">(Latino)</span></span>
+                <span><span class="cyrillic">gооglе.com</span> <span class="label">(Cirílico: 'o', 'e')</span></span>
+                <span><span class="latin">paypal.com</span> <span class="label">(Latino)</span></span>
+                <span><span class="cyrillic">раypal.com</span> <span class="label">(Cirílico: 'p', 'a')</span></span>
+            </div>
+            <div class="char-group">
+                <span><span class="latin">a</span> <span class="label">(Latino)</span> vs <span class="cyrillic">а</span> <span class="label">(Cirílico)</span></span>
+                <span><span class="latin">o</span> <span class="label">(Latino)</span> vs <span class="cyrillic">о</span> <span class="label">(Cirílico)</span></span>
+                <span><span class="latin">e</span> <span class="label">(Latino)</span> vs <span class="cyrillic">е</span> <span class="label">(Cirílico)</span></span>
+                <span><span class="latin">p</span> <span class="label">(Latino)</span> vs <span class="cyrillic">р</span> <span class="label">(Cirílico)</span></span>
+            </div>
+        </div>
+        <p>A continuación, te presentaremos 10 correos electrónicos simulados. Tu tarea será identificar cuáles son legítimos y cuáles son un intento de phishing homográfico. ¡Presta mucha atención a los enlaces!</p>
+        <button class="button correct start-button" onclick="startQuiz()">Comenzar Test</button>
+    </div>
+    
+    <div id="quiz-screen" class="hidden">
+        <h2 id="question-counter"></h2>
+        
+        <div class="email-container">
+            <h3>Asunto: <span id="email-subject"></span></h3>
+            <div class="email-header">
+                <strong>De:</strong> <span id="email-sender"></span><br>
+                <strong>Para:</strong> Usuario
+            </div>
+            <hr>
+            <div class="email-body">
+                <p>Estimado/a Usuario,</p>
+                <p id="email-text"></p>
+                <p>Para verificar su cuenta, por favor haga click en el siguiente enlace:</p>
+                <p><a href="#" class="phishing-url" id="email-link"></a></p>
+                <p>Gracias,<br>El equipo de Seguridad.</p>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="button correct" onclick="checkAnswer(true)">✅ Legítimo</button>
+            <button class="button phishing" onclick="checkAnswer(false)">⚠️ Phishing</button>
+        </div>
+
+        <div id="feedback-message" class="feedback"></div>
+        <button id="next-button" class="button correct hidden" onclick="nextQuestion()">Siguiente Correo</button>
+
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2>🎉 Resultados del Test</h2>
+        <p>Has completado el test. ¡Aquí está tu puntuación!</p>
+        <div id="result-summary"></div>
+        <p>Recuerda: El Phishing Homográfico utiliza caracteres de diferentes alfabetos (como el cirílico) que se parecen visualmente a letras latinas, haciendo que sea muy difícil distinguir un dominio real de uno falso (ej: <code>gооglе.com</code> vs <code>google.com</code>).</p>
+        <button class="button correct" onclick="location.reload()">Reiniciar Test</button>
+    </div>
+
+</div>
+
+<script>
+    const questions = [
+        {
+            subject: "¡Alerta de Seguridad! Su cuenta ha sido bloqueada temporalmente.",
+            sender: "Security@paypal.com",
+            text: "Hemos detectado un inicio de sesión inusual. Por favor, haga click en el enlace para verificar su identidad y desbloquear su cuenta.",
+            link: "https://www.раypal.com/verify-account", // 'p' y 'a' cirílicos
+            isPhishing: true,
+            explanation: "PHISHING: El dominio es 'p**а**ypal.com'. La letra 'a' es cirílica (U+0430) y no la 'a' latina."
+        },
+        {
+            subject: "Factura de su compra en Apple - Recibo #987654",
+            sender: "noreply@apple.com",
+            text: "Gracias por su reciente compra. Adjuntamos su factura. Si no reconoce esta compra, puede cancelarla aquí.",
+            link: "https://www.apple.com/account/cancel-purchase",
+            isPhishing: false,
+            explanation: "LEGÍTIMO: El dominio es 'apple.com'. Es la URL oficial de Apple."
+        },
+        {
+            subject: "Su clave de acceso ha expirado, actualice inmediatamente.",
+            sender: "support@google.com",
+            text: "Por motivos de seguridad, su contraseña ha expirado. Siga el enlace para establecer una nueva contraseña de inmediato.",
+            link: "https://acco**u**nts.g**o**ogle.com/update-password", // 'u' y 'o' latinas
+            isPhishing: false,
+            explanation: "LEGÍTIMO: El dominio es 'accounts.google.com'. No hay caracteres cirílicos."
+        },
+        {
+            subject: "¡Ganador! Reclame su premio de fidelidad.",
+            sender: "promotions@microsoft.com",
+            text: "¡Felicidades! Ha sido seleccionado como ganador. Reclame su premio haciendo click en el enlace de abajo.",
+            link: "https://microsоft.com/prize/claim", // 'o' cirílica
+            isPhishing: true,
+            explanation: "PHISHING: El dominio es 'micros**о**ft.com'. La letra 'o' es cirílica (U+043E) y no la 'o' latina."
+        },
+        {
+            subject: "Notificación de envío de Amazon - Su paquete está listo.",
+            sender: "shipment@amazon.com",
+            text: "Su paquete #XYZ123 está listo para ser enviado. Por favor, confirme su dirección haciendo click en el enlace.",
+            link: "https://www.amazоn.com/confirm-address", // 'o' cirílica
+            isPhishing: true,
+            explanation: "PHISHING: El dominio es 'amaz**о**n.com'. La letra 'o' es cirílica (U+043E) y no la 'o' latina."
+        },
+        {
+            subject: "Ha recibido un nuevo mensaje de WhatsApp",
+            sender: "notificaciones@whatsapp.com",
+            text: "Alguien ha intentado enviarle un mensaje. Haga click aquí para verlo en línea.",
+            link: "https://web.whаtsapp.com/view-message", // 'a' cirílica
+            isPhishing: true,
+            explanation: "PHISHING: El dominio es 'wh**а**tsapp.com'. La letra 'a' es cirílica (U+0430) y no la 'a' latina."
+        },
+        {
+            subject: "Actualización de Términos de Servicio - Requerida su acción",
+            sender: "support@dropbox.com",
+            text: "Hemos actualizado nuestros Términos de Servicio. Por favor, revíselos y acéptelos para continuar usando nuestros servicios.",
+            link: "https://www.dr**o**pb**o**x.com/terms-update", // 'o' y 'o' latinas
+            isPhishing: false,
+            explanation: "LEGÍTIMO: El dominio es 'dropbox.com'. No hay caracteres cirílicos."
+        },
+        {
+            subject: "Verificación de Cuenta de Netflix Requerida",
+            sender: "noreply@netflix.com",
+            text: "Su información de pago ha sido rechazada. Actualice su información de pago para evitar la interrupción del servicio.",
+            link: "https://www.netfl**i**x.com/payment-update", // 'i' latina
+            isPhishing: false,
+            explanation: "LEGÍTIMO: El dominio es 'netflix.com'. No hay caracteres cirílicos."
+        },
+        {
+            subject: "Hemos detectado un error de sistema. Por favor, inicie sesión.",
+            sender: "noreply@sistema.com",
+            text: "Se ha detectado un error crítico en su cuenta. Inicie sesión en el enlace a continuación para corregirlo.",
+            link: "https://sistеma.com/login", // 'e' cirílica
+            isPhishing: true,
+            explanation: "PHISHING: El dominio es 'sist**е**ma.com'. La letra 'e' es cirílica (U+0435) y no la 'e' latina."
+        },
+        {
+            subject: "Su pedido ha sido completado y enviado.",
+            sender: "ventas@tiendaonline.com",
+            text: "Gracias por su compra. El seguimiento de su pedido está disponible en el siguiente enlace.",
+            link: "https://tiendaonline.c**o**m/track-order", // 'o' latina
+            isPhishing: false,
+            explanation: "LEGÍTIMO: El dominio es 'tiendaonline.com'. No hay caracteres cirílicos."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const introScreen = document.getElementById('intro-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const questionCounter = document.getElementById('question-counter');
+    const emailSubject = document.getElementById('email-subject');
+    const emailSender = document.getElementById('email-sender');
+    const emailText = document.getElementById('email-text');
+    const emailLink = document.getElementById('email-link');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const nextButton = document.getElementById('next-button');
+    const resultSummary = document.getElementById('result-summary');
+    const buttons = document.querySelectorAll('.buttons .button');
+    const mainTitle = document.getElementById('main-title');
+
+    function startQuiz() {
+        introScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        mainTitle.textContent = "Test de Phishing Homográfico"; // Asegurarse de que el título esté correcto
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const q = questions[currentQuestionIndex];
+        
+        questionCounter.textContent = `Correo ${currentQuestionIndex + 1} de ${questions.length}`;
+        emailSubject.textContent = q.subject;
+        emailSender.textContent = q.sender;
+        emailText.textContent = q.text;
+        emailLink.textContent = q.link;
+        emailLink.href = '#'; // Prevenir navegación real
+        
+        // Resetear estado
+        feedbackMessage.style.display = 'none';
+        feedbackMessage.className = 'feedback';
+        nextButton.classList.add('hidden');
+        buttons.forEach(btn => btn.disabled = false);
+    }
+
+    function checkAnswer(isLegit) {
+        const q = questions[currentQuestionIndex];
+        const isCorrect = (isLegit === !q.isPhishing); // isLegit=true & isPhishing=false O isLegit=false & isPhishing=true
+        
+        if (isCorrect) {
+            score++;
+            feedbackMessage.textContent = '¡Correcto! ' + (q.isPhishing ? 'Es Phishing.' : 'Es Legítimo.');
+            feedbackMessage.classList.add('correct-answer');
+        } else {
+            feedbackMessage.textContent = '¡Incorrecto! ' + q.explanation;
+            feedbackMessage.classList.add('wrong-answer');
+        }
+
+        // Mostrar retroalimentación
+        feedbackMessage.style.display = 'block';
+        nextButton.classList.remove('hidden');
+        buttons.forEach(btn => btn.disabled = true);
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        quizScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        resultSummary.innerHTML = `Su puntuación final es: <strong>${score} / ${questions.length}</strong>`;
+        mainTitle.textContent = "Test Finalizado";
+    }
+
+</script>
+
+<hr> 
+    <footer>        
+        <p>&copy; 2025 www.unfantasmaenelsistema.com </p>    
+    </footer>
+
+</body>
+</html>
+```
